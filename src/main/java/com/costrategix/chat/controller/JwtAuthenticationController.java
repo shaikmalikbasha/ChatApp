@@ -18,23 +18,25 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class JwtAuthenticationController {
 
-    @Autowired
     private AuthenticationManager authenticationManager;
-
-    @Autowired
     private JwtTokenUtil jwtTokenUtil;
+    private UserService userService;
 
     @Autowired
-    private UserService userService;
+    public JwtAuthenticationController(AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, UserService userService) {
+        this.authenticationManager = authenticationManager;
+        this.jwtTokenUtil = jwtTokenUtil;
+        this.userService = userService;
+    }
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
 
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 
-        final UserDetails userDetails = userService.loadUserByUsername(authenticationRequest.getUsername());
+        final UserDetails userDetails = this.userService.loadUserByUsername(authenticationRequest.getUsername());
 
-        final String token = jwtTokenUtil.generateToken(userDetails);
+        final String token = this.jwtTokenUtil.generateToken(userDetails);
 
         return ResponseEntity.ok(new JwtResponse(token));
     }
@@ -46,7 +48,7 @@ public class JwtAuthenticationController {
 
     private void authenticate(String username, String password) throws Exception {
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         } catch (DisabledException e) {
             throw new Exception("USER_DISABLED", e);
         } catch (BadCredentialsException e) {

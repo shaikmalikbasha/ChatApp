@@ -24,6 +24,7 @@ public class JwtTokenUtil implements Serializable {
     private String secret;
 
     public String getUsernameFromToken(String token) {
+
         return getClaimFromToken(token, Claims::getSubject);
     }
 

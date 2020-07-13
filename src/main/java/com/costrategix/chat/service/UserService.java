@@ -13,14 +13,12 @@ import java.util.ArrayList;
 
 @Service
 public class UserService implements UserDetailsService {
-    private UserRepository userRepository;
-    private PasswordEncoder bcryptEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder bcryptEncoder) {
-        this.userRepository = userRepository;
-        this.bcryptEncoder = bcryptEncoder;
-    }
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder bcryptEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -29,6 +27,10 @@ public class UserService implements UserDetailsService {
             throw new UsernameNotFoundException("User not found with username : " + username);
         }
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), new ArrayList<>());
+    }
+
+    public User getUserDetailsByUsername(String username) {
+       return this.userRepository.findByUsername(username);
     }
 
     public User save(User user) {
