@@ -1,5 +1,7 @@
 package com.costrategix.chat.service;
 
+import com.costrategix.chat.config.JwtTokenUtil;
+import com.costrategix.chat.dto.UserDto;
 import com.costrategix.chat.model.User;
 import com.costrategix.chat.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,13 +12,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
-
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
     @Autowired
     private PasswordEncoder bcryptEncoder;
 
@@ -29,6 +33,12 @@ public class UserService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), new ArrayList<>());
     }
 
+    public User getUserByToken(String token) {
+        String jwtToken = token.substring(7);
+        String username = this.jwtTokenUtil.getUsernameFromToken(jwtToken);
+        return this.getUserDetailsByUsername(username);
+    }
+
     public User getUserDetailsByUsername(String username) {
        return this.userRepository.findByUsername(username);
     }
@@ -39,5 +49,9 @@ public class UserService implements UserDetailsService {
         newUser.setUsername(user.getUsername());
         newUser.setPassword(this.bcryptEncoder.encode(user.getPassword()));
         return this.userRepository.save(newUser);
+    }
+
+    public List<UserDto> getRecipientsById(long fromId) {
+        return this.userRepository.getRecipientsById(fromId);
     }
 }

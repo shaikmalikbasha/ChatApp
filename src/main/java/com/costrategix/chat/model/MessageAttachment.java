@@ -4,7 +4,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "message_attachments")
-public class MessageAttachments {
+public class MessageAttachment {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
@@ -14,7 +14,7 @@ public class MessageAttachments {
     @Column(name = "fileName")
     private String fileName;
 
-    public MessageAttachments() {
+    public MessageAttachment() {
     }
 
     public long getId() {

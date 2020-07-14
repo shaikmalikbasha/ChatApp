@@ -1,8 +1,6 @@
 package com.costrategix.chat.model;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 
 @Entity
