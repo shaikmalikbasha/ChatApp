@@ -1,5 +1,7 @@
 package com.costrategix.chat.service;
 
+import com.costrategix.chat.dto.MessageHistoryDto;
+import com.costrategix.chat.exception.MessageException;
 import com.costrategix.chat.model.Message;
 import com.costrategix.chat.model.MessageAttachment;
 import com.costrategix.chat.model.MessageRecipients;
@@ -8,6 +10,8 @@ import com.costrategix.chat.repository.MessageRecipientRepository;
 import com.costrategix.chat.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class MessageService {
@@ -24,7 +28,7 @@ public class MessageService {
     }
 
     public Message saveMessage(Message message, long fromId, long recipientId) {
-        Message newMessage = new Message();
+        Message newMessage = new Message(); // we can use constructor here but to validate in future we used getters and setters
         newMessage.setSubject(message.getSubject());
         newMessage.setContent(message.getContent());
         newMessage.setFromId(fromId);
@@ -51,4 +55,15 @@ public class MessageService {
         return this.messageAttachmentRepository.save(attachment);
     }
 
+    public Message getMessageById(long messageId) throws MessageException {
+        return this.messageRepository.findById(messageId).orElseThrow(() -> new MessageException(messageId));
+    }
+
+    public boolean updateReadStatusByMessageId(long messageId) {
+        return (this.messageRepository.updateMessageByMessageId(messageId) > 0) ? true : false;
+    }
+
+    public List<MessageHistoryDto> getMessageHistoryByUserId(long userId) {
+        return this.messageRepository.getMessageHistoryByUserId(userId);
+    }
 }

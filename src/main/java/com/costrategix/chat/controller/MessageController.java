@@ -38,4 +38,21 @@ public class MessageController {
         User user = this.userService.getUserByToken(requestTokenHeader);
         return new ResponseEntity<>(this.userService.getRecipientsById(user.getId()), HttpStatus.OK);
     }
+
+    @RequestMapping(value = "update-read-status/{messageId}")
+    public boolean updateReadStatusByMessageId(@PathVariable long messageId) {
+        return this.messageService.updateReadStatusByMessageId(messageId);
+    }
+
+    @RequestMapping(value = "/messages", method = RequestMethod.GET)
+    public ResponseEntity<?> getSentMessagesByUserId(HttpServletRequest request) {
+        final String requestTokenHeader = request.getHeader("Authorization");
+        User user = this.userService.getUserByToken(requestTokenHeader);
+        return new ResponseEntity<>(this.messageService.getMessageHistoryByUserId(user.getId()), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/messages/{recipientId}", method = RequestMethod.GET)
+    public ResponseEntity<?> getRecievedMessagesByUserId(@PathVariable long recipientId) {
+        return new ResponseEntity<>(this.messageService.getMessageHistoryByUserId(recipientId), HttpStatus.OK);
+    }
 }
