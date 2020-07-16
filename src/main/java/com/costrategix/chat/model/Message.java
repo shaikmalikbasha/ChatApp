@@ -1,7 +1,5 @@
 package com.costrategix.chat.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 import java.util.Date;
 
@@ -25,10 +23,6 @@ public class Message {
 
     @Column(name = "threadId")
     private Long threadId = null;
-
-    @JsonIgnore
-    @Transient
-    private String fileName;
 
     @Column(name = "createdAt")
     private Date createdAt = new Date();
@@ -84,14 +78,6 @@ public class Message {
         this.createdAt = createdAt;
     }
 
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
     @Override
     public String toString() {
         return "Message{" +
@@ -100,7 +86,6 @@ public class Message {
                 ", content='" + content + '\'' +
                 ", fromId=" + fromId +
                 ", threadId=" + threadId +
-                ", fileName='" + fileName + '\'' +
                 ", createdAt=" + createdAt +
                 '}';
     }
