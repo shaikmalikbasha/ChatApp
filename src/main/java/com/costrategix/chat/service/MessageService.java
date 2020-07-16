@@ -9,6 +9,7 @@ import com.costrategix.chat.repository.MessageAttachmentRepository;
 import com.costrategix.chat.repository.MessageRecipientRepository;
 import com.costrategix.chat.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -55,8 +56,8 @@ public class MessageService {
         return this.messageAttachmentRepository.save(attachment);
     }
 
-    public Message getMessageById(long messageId) throws MessageException {
-        return this.messageRepository.findById(messageId).orElseThrow(() -> new MessageException(messageId));
+    public MessageHistoryDto getMessageById(long messageId) {
+        return this.messageRepository.getMessageByMessageId(messageId);
     }
 
     public boolean updateReadStatusByMessageId(long messageId) {
@@ -66,4 +67,9 @@ public class MessageService {
     public List<MessageHistoryDto> getMessageHistoryByUserId(long userId) {
         return this.messageRepository.getMessageHistoryByUserId(userId);
     }
+
+//    public List<Message> getSearchResultByQuery(String query, long userId) {
+//        List<Message> res = this.messageRepository.getMessageHistoryBySearch(query, userId);
+//        return res;
+//    }
 }

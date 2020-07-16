@@ -55,4 +55,16 @@ public class MessageController {
     public ResponseEntity<?> getRecievedMessagesByUserId(@PathVariable long recipientId) {
         return new ResponseEntity<>(this.messageService.getMessageHistoryByUserId(recipientId), HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/messages/id/{messageId}", method = RequestMethod.GET)
+    public ResponseEntity<?> getMessageById(@PathVariable long messageId) {
+        return new ResponseEntity<>(this.messageService.getMessageById(messageId), HttpStatus.OK);
+    }
+
+//    @RequestMapping(value = "/search")
+//    public ResponseEntity<?> getSearchResultsByQuery(HttpServletRequest request, @RequestParam String query) {
+//        final String requestTokenHeader = request.getHeader("Authorization");
+//        User user = this.userService.getUserByToken(requestTokenHeader);
+//        return new ResponseEntity<>(this.messageService.getSearchResultByQuery(query, user.getId()), HttpStatus.OK);
+//    }
 }
