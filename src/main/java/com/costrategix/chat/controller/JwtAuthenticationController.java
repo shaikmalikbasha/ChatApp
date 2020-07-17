@@ -6,6 +6,7 @@ import com.costrategix.chat.model.JwtResponse;
 import com.costrategix.chat.model.User;
 import com.costrategix.chat.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -15,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping(value = "api/users")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class JwtAuthenticationController {
 
@@ -31,19 +33,20 @@ public class JwtAuthenticationController {
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
-
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
-
         final UserDetails userDetails = this.userService.loadUserByUsername(authenticationRequest.getUsername());
-
         final String token = this.jwtTokenUtil.generateToken(userDetails);
-
         return ResponseEntity.ok(new JwtResponse(token));
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseEntity<?> saveUser(@RequestBody User user) throws Exception {
         return ResponseEntity.ok(this.userService.save(user));
+    }
+
+    @RequestMapping(value = "/search", method = RequestMethod.GET)
+    public ResponseEntity<?> getUsersBySearchQuery(@RequestParam String q) {
+        return new ResponseEntity<>(this.userService.getUsersBySearchQuery(q), HttpStatus.OK);
     }
 
     private void authenticate(String username, String password) throws Exception {

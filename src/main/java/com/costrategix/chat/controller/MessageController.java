@@ -21,6 +21,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping(value = "/api/chat")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class MessageController {
     private static final Logger logger = LoggerFactory.getLogger(MessageController.class);
 
@@ -94,10 +95,16 @@ public class MessageController {
                 .body(resource);
     }
 
-//    @RequestMapping(value = "/search")
-//    public ResponseEntity<?> getSearchResultsByQuery(HttpServletRequest request, @RequestParam String query) {
+//    @RequestMapping("/reply-message/{recipientId}")
+//    public ResponseEntity<?> addReplyToMessageByMessageId(@RequestParam(value = "files", required = false) MultipartFile[] files, HttpServletRequest request, Message message, @PathVariable long recipientId) throws Exception {
 //        final String requestTokenHeader = request.getHeader("Authorization");
 //        User user = this.userService.getUserByToken(requestTokenHeader);
-//        return new ResponseEntity<>(this.messageService.getSearchResultByQuery(query, user.getId()), HttpStatus.OK);
+//        message.setThreadId(messageId);
+//        return new ResponseEntity<>(this.messageService.saveMessage(), HttpStatus.OK);
 //    }
+
+    @RequestMapping(value = "/search")
+    public ResponseEntity<?> getSearchResultsByQuery(@RequestParam String query) {
+        return new ResponseEntity<>(this.messageService.getSearchResultByQuery(query), HttpStatus.OK);
+    }
 }

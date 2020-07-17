@@ -15,4 +15,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
     @Query("SELECT DISTINCT new com.costrategix.chat.dto.UserDto(u.id, u.name, u.username) FROM User u, Message m, MessageRecipients mr WHERE m.id = mr.messageId AND mr.recipientId = u.id AND m.fromId = ?1")
     List<UserDto> getRecipientsById(long fromId);
 
+    @Query("SELECT DISTINCT new com.costrategix.chat.dto.UserDto(u.id, u.name, u.username) FROM User u WHERE u.name LIKE %:q%")
+    List<UserDto> getUsersBySearchQuery(String q);
 }

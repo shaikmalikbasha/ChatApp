@@ -1,12 +1,10 @@
 package com.costrategix.chat.service;
 
-import com.costrategix.chat.controller.FileController;
 import com.costrategix.chat.dto.MessageHistoryDto;
 import com.costrategix.chat.exception.MessageException;
 import com.costrategix.chat.model.Message;
 import com.costrategix.chat.model.MessageAttachment;
 import com.costrategix.chat.model.MessageRecipients;
-import com.costrategix.chat.model.UploadFileResponse;
 import com.costrategix.chat.repository.MessageAttachmentRepository;
 import com.costrategix.chat.repository.MessageRecipientRepository;
 import com.costrategix.chat.repository.MessageRepository;
@@ -20,11 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -122,8 +118,7 @@ public class MessageService {
                 .body(resource);
     }
 
-//    public List<Message> getSearchResultByQuery(String query, long userId) {
-//        List<Message> res = this.messageRepository.getMessageHistoryBySearch(query, userId);
-//        return res;
-//    }
+    public List<Message> getSearchResultByQuery(String query) {
+        return this.messageRepository.getMessageHistoryBySearch(query);
+    }
 }
