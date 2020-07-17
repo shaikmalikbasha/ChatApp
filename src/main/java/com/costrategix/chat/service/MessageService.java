@@ -88,7 +88,6 @@ public class MessageService {
         }
         String fileName = fileStorageService.storeFile(file);
         MessageAttachment attachment = this.saveAttachment(messageId, fileName);
-        System.out.println("FileName: " + fileName);
     }
 
     public void uploadMultipleAttachments(@RequestParam(value = "files", required = false) MultipartFile[] files, long messageId) throws MessageException {

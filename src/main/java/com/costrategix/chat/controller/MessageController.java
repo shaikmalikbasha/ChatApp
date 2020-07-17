@@ -95,14 +95,6 @@ public class MessageController {
                 .body(resource);
     }
 
-//    @RequestMapping("/reply-message/{recipientId}")
-//    public ResponseEntity<?> addReplyToMessageByMessageId(@RequestParam(value = "files", required = false) MultipartFile[] files, HttpServletRequest request, Message message, @PathVariable long recipientId) throws Exception {
-//        final String requestTokenHeader = request.getHeader("Authorization");
-//        User user = this.userService.getUserByToken(requestTokenHeader);
-//        message.setThreadId(messageId);
-//        return new ResponseEntity<>(this.messageService.saveMessage(), HttpStatus.OK);
-//    }
-
     @RequestMapping(value = "/search")
     public ResponseEntity<?> getSearchResultsByQuery(@RequestParam String query) {
         return new ResponseEntity<>(this.messageService.getSearchResultByQuery(query), HttpStatus.OK);
