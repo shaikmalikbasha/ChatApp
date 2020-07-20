@@ -10,11 +10,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.HttpMediaTypeException;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +41,7 @@ public class UserService implements UserDetailsService {
     }
 
     public User getUserDetailsByUsername(String username) {
-       return this.userRepository.findByUsername(username);
+        return this.userRepository.findByUsername(username);
     }
 
     public User save(User user) {

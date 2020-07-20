@@ -5,6 +5,7 @@ import com.costrategix.chat.exception.MessageException;
 import com.costrategix.chat.model.Message;
 import com.costrategix.chat.model.MessageAttachment;
 import com.costrategix.chat.model.MessageRecipients;
+import com.costrategix.chat.model.User;
 import com.costrategix.chat.repository.MessageAttachmentRepository;
 import com.costrategix.chat.repository.MessageRecipientRepository;
 import com.costrategix.chat.repository.MessageRepository;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,7 +23,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -41,7 +45,7 @@ public class MessageService {
         this.fileStorageService = fileStorageService;
     }
 
-    public Message saveMessage(Message message, long fromId, long recipientId, MultipartFile[] files) throws MessageException {
+    public Message saveMessage(Message message, long fromId, long[] recipients, MultipartFile[] files) throws MessageException {
         Message newMessage = new Message(); // we can use constructor here but to validate in future we used getters and setters
         newMessage.setSubject(message.getSubject());
         newMessage.setContent(message.getContent());
@@ -49,7 +53,8 @@ public class MessageService {
         newMessage.setThreadId(message.getThreadId());
         newMessage = this.messageRepository.save(newMessage);
         if (newMessage.getId() != 0) {
-            this.saveMessageRecipientData(newMessage.getId(), recipientId);
+            for (int i = 0; i < recipients.length; i++)
+                this.saveMessageRecipientData(newMessage.getId(), recipients[i]);
             this.uploadMultipleAttachments(files, newMessage.getId());
         }
         return newMessage;
@@ -75,10 +80,6 @@ public class MessageService {
 
     public boolean updateReadStatusByMessageId(long messageId) {
         return (this.messageRepository.updateMessageByMessageId(messageId) > 0) ? true : false;
-    }
-
-    public List<MessageHistoryDto> getMessageHistoryByUserId(long userId) {
-        return this.messageRepository.getMessageHistoryByUserId(userId);
     }
 
     public void uploadAttachment(MultipartFile file, long messageId) throws MessageException {
@@ -120,4 +121,31 @@ public class MessageService {
     public List<Message> getSearchResultByQuery(String query) {
         return this.messageRepository.getMessageHistoryBySearch(query);
     }
+
+    public ResponseEntity<?> getSentMessagesByUser(User user) {
+        List<MessageHistoryDto> sentMessages = this.messageRepository.getSentParentMessages(user.getId());
+        return new ResponseEntity<>(this.getChildMessages(user, sentMessages), HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> getRecievedMessagesByUser(User user) {
+        List<MessageHistoryDto> recievedMessages = this.messageRepository.getRecievedParentMessages(user.getId());
+        return new ResponseEntity<>(this.getChildMessages(user, recievedMessages), HttpStatus.OK);
+    }
+
+    public List<Object> getChildMessages(User user, List<MessageHistoryDto> messages) {
+        List<Long> recipients = new ArrayList<>();
+        List<Object> response = new ArrayList<>();
+        Iterator iterator = messages.iterator();
+        while (iterator.hasNext()) {
+            MessageHistoryDto message = (MessageHistoryDto) iterator.next();
+            if (!recipients.contains(message.getMessageId())) {
+                recipients.add(message.getMessageId());
+                List<MessageHistoryDto> replies = this.messageRepository.getRepliedMessages(message.getMessageId(), user.getId());
+                message.setChilds(replies);
+                response.add(message);
+            }
+        }
+        return response;
+    }
 }
+

@@ -1,20 +1,27 @@
 package com.costrategix.chat.model;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name = "message_recipients")
 public class MessageRecipients {
     @Column(name = "recipientReadStatus")
     boolean isRead = false;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private long id;
+
     @Column(name = "messageId")
     private long messageId;
+
     @Column(name = "recipientId")
     private long recipientId;
+
+    @Column(name = "createdAt")
+    private Date createdAt = new Date();
 
     public MessageRecipients() {
     }
@@ -51,6 +58,14 @@ public class MessageRecipients {
         isRead = read;
     }
 
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
     @Override
     public String toString() {
         return "MessageRecipients{" +
@@ -58,6 +73,7 @@ public class MessageRecipients {
                 ", id=" + id +
                 ", messageId=" + messageId +
                 ", recipientId=" + recipientId +
+                ", createdAt=" + createdAt +
                 '}';
     }
 }

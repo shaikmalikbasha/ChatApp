@@ -1,5 +1,6 @@
 package com.costrategix.chat.controller;
 
+import com.costrategix.chat.dto.MessageHistoryDto;
 import com.costrategix.chat.model.Message;
 import com.costrategix.chat.model.User;
 import com.costrategix.chat.service.FileStorageService;
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/chat")
@@ -36,12 +38,20 @@ public class MessageController {
         this.fileStorageService = fileStorageService;
     }
 
-    @RequestMapping(value = "/send-message/{recipientId}", method = RequestMethod.POST)
-    public Message sendMessage(@RequestParam(value = "files", required = false) MultipartFile[] files, HttpServletRequest request, Message message, @PathVariable long recipientId) throws Exception {
+    @RequestMapping(value = "/send-message", method = RequestMethod.POST)
+    public Message sendMessage(@RequestParam(value = "files", required = false) MultipartFile[] files, HttpServletRequest request, Message message, @RequestParam long[] recipients) throws Exception {
         final String requestTokenHeader = request.getHeader("Authorization");
         User user = this.userService.getUserByToken(requestTokenHeader);
         long fromId = user.getId();
-        return this.messageService.saveMessage(message, fromId, recipientId, files);
+        return this.messageService.saveMessage(message, fromId, recipients, files);
+    }
+
+    @RequestMapping(value = "/reply-to-message/{messageId}", method = RequestMethod.POST)
+    public Message addReplyToMessage(@RequestParam(value = "files", required = false) MultipartFile[] files, HttpServletRequest request, Message message, @RequestParam long[] recipients, @PathVariable long messageId) throws Exception {
+        final String requestTokenHeader = request.getHeader("Authorization");
+        User user = this.userService.getUserByToken(requestTokenHeader);
+        message.setThreadId(messageId);
+        return this.messageService.saveMessage(message, user.getId(), recipients, files);
     }
 
     @RequestMapping(value = "/get-recipients", method = RequestMethod.GET)
@@ -54,18 +64,6 @@ public class MessageController {
     @RequestMapping(value = "update-read-status/{messageId}")
     public boolean updateReadStatusByMessageId(@PathVariable long messageId) {
         return this.messageService.updateReadStatusByMessageId(messageId);
-    }
-
-    @RequestMapping(value = "/messages", method = RequestMethod.GET)
-    public ResponseEntity<?> getSentMessagesByUserId(HttpServletRequest request) {
-        final String requestTokenHeader = request.getHeader("Authorization");
-        User user = this.userService.getUserByToken(requestTokenHeader);
-        return new ResponseEntity<>(this.messageService.getMessageHistoryByUserId(user.getId()), HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "/messages/{recipientId}", method = RequestMethod.GET)
-    public ResponseEntity<?> getRecievedMessagesByUserId(@PathVariable long recipientId) {
-        return new ResponseEntity<>(this.messageService.getMessageHistoryByUserId(recipientId), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/messages/id/{messageId}", method = RequestMethod.GET)
@@ -98,5 +96,19 @@ public class MessageController {
     @RequestMapping(value = "/search")
     public ResponseEntity<?> getSearchResultsByQuery(@RequestParam String query) {
         return new ResponseEntity<>(this.messageService.getSearchResultByQuery(query), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/get-sent-messages", method = RequestMethod.GET)
+    public ResponseEntity<?> getSentMessagesByUser(HttpServletRequest request) {
+        final String requestTokenHeader = request.getHeader("Authorization");
+        User user = this.userService.getUserByToken(requestTokenHeader);
+        return new ResponseEntity<>(this.messageService.getSentMessagesByUser(user), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/get-recieved-messages", method = RequestMethod.GET)
+    public ResponseEntity<?> getRecievedMessagesByUser(HttpServletRequest request) {
+        final String requestTokenHeader = request.getHeader("Authorization");
+        User user = this.userService.getUserByToken(requestTokenHeader);
+        return new ResponseEntity<>(this.messageService.getRecievedMessagesByUser(user), HttpStatus.OK);
     }
 }

@@ -2,6 +2,7 @@ package com.costrategix.chat.model;
 
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name = "user")
@@ -20,6 +21,9 @@ public class User {
 
     @Column(name = "password")
     private String password;
+
+    @Column(name = "createdAt")
+    private Date createdAt = new Date();
 
     public User() {
     }
@@ -54,6 +58,14 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 
     @Override
