@@ -137,28 +137,20 @@ public class MessageService {
 
     public List<Object> getChildMessages(User user, List<MessageHistoryDto> messages) {
         List<Object> response = new ArrayList<>();
-        List<Long> recipients = new ArrayList<>();
         Iterator iterator = messages.iterator();
         while (iterator.hasNext()) {
             MessageHistoryDto message = (MessageHistoryDto) iterator.next();
-            if (!recipients.contains(message.getMessageId())) {
-                recipients.add(message.getMessageId());
-                message.setRecipients(this.getRecipientsIdsByMessageId(message.getMessageId()));
-                List<MessageHistoryDto> childMessages = this.messageRepository.getRepliedMessages(message.getMessageId(), user.getId());
-                Iterator i = childMessages.iterator();
-                List<MessageHistoryDto> childMessagesContainer = new ArrayList<>();
-                List<Long> childRecipientsIds = new ArrayList<>();
-                while (i.hasNext()) {
-                    MessageHistoryDto messageHistoryDto = (MessageHistoryDto) i.next();
-                    if (!childRecipientsIds.contains(messageHistoryDto.getMessageId())) {
-                        childRecipientsIds.add(messageHistoryDto.getMessageId());
-                        messageHistoryDto.setRecipients(this.getRecipientsIdsByMessageId(messageHistoryDto.getMessageId()));
-                        childMessagesContainer.add(messageHistoryDto);
-                    }
-                }
-                message.setRepliedMessages(childMessagesContainer);
-                response.add(message);
+            message.setRecipients(this.getRecipientsIdsByMessageId(message.getMessageId()));
+            List<MessageHistoryDto> childMessages = this.messageRepository.getRepliedMessages(message.getMessageId(), user.getId());
+            Iterator i = childMessages.iterator();
+            List<MessageHistoryDto> childMessagesContainer = new ArrayList<>();
+            while (i.hasNext()) {
+                MessageHistoryDto messageHistoryDto = (MessageHistoryDto) i.next();
+                messageHistoryDto.setRecipients(this.getRecipientsIdsByMessageId(messageHistoryDto.getMessageId()));
+                childMessagesContainer.add(messageHistoryDto);
             }
+            message.setRepliedMessages(childMessagesContainer);
+            response.add(message);
         }
         return response;
     }
