@@ -1,6 +1,7 @@
 package com.costrategix.chat.service;
 
 import com.costrategix.chat.dto.MessageHistoryDto;
+import com.costrategix.chat.dto.UserDto;
 import com.costrategix.chat.exception.MessageException;
 import com.costrategix.chat.model.Message;
 import com.costrategix.chat.model.MessageAttachment;
@@ -36,13 +37,15 @@ public class MessageService {
     private MessageRecipientRepository messageRecipientRepository;
     private MessageAttachmentRepository messageAttachmentRepository;
     private FileStorageService fileStorageService;
+    private UserService userService;
 
     @Autowired
-    public MessageService(MessageRepository messageRepository, MessageRecipientRepository messageRecipientRepository, MessageAttachmentRepository messageAttachmentRepository, FileStorageService fileStorageService) {
+    public MessageService(MessageRepository messageRepository, MessageRecipientRepository messageRecipientRepository, MessageAttachmentRepository messageAttachmentRepository, FileStorageService fileStorageService, UserService userService) {
         this.messageRepository = messageRepository;
         this.messageRecipientRepository = messageRecipientRepository;
         this.messageAttachmentRepository = messageAttachmentRepository;
         this.fileStorageService = fileStorageService;
+        this.userService = userService;
     }
 
     public Message saveMessage(Message message, long fromId, long[] recipients, MultipartFile[] files) throws MessageException {
@@ -133,19 +136,28 @@ public class MessageService {
     }
 
     public List<Object> getChildMessages(User user, List<MessageHistoryDto> messages) {
-        List<Long> recipients = new ArrayList<>();
         List<Object> response = new ArrayList<>();
         Iterator iterator = messages.iterator();
         while (iterator.hasNext()) {
             MessageHistoryDto message = (MessageHistoryDto) iterator.next();
-            if (!recipients.contains(message.getMessageId())) {
-                recipients.add(message.getMessageId());
-                List<MessageHistoryDto> replies = this.messageRepository.getRepliedMessages(message.getMessageId(), user.getId());
-                message.setChilds(replies);
-                response.add(message);
+            message.setRecipients(this.getRecipientsIdsByMessageId(message.getMessageId()));
+            List<MessageHistoryDto> childMessages = this.messageRepository.getRepliedMessages(message.getMessageId(), user.getId());
+            Iterator i = childMessages.iterator();
+            List<MessageHistoryDto> childMessagesContainer = new ArrayList<>();
+            while (i.hasNext()) {
+                MessageHistoryDto messageHistoryDto = (MessageHistoryDto) i.next();
+                messageHistoryDto.setRecipients(this.getRecipientsIdsByMessageId(messageHistoryDto.getMessageId()));
+                childMessagesContainer.add(messageHistoryDto);
             }
+            message.setRepliedMessages(childMessagesContainer);
+            response.add(message);
         }
         return response;
+    }
+
+    public List<UserDto> getRecipientsIdsByMessageId(long messageId) {
+        List<Long> recipientsIds = this.messageRepository.getRecipientsIdsByMessageId(messageId);
+        return this.userService.getUserDetailsByRecipientsIds(recipientsIds);
     }
 }
 
