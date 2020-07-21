@@ -1,6 +1,5 @@
 package com.costrategix.chat.controller;
 
-import com.costrategix.chat.dto.MessageHistoryDto;
 import com.costrategix.chat.model.Message;
 import com.costrategix.chat.model.User;
 import com.costrategix.chat.service.FileStorageService;
@@ -19,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/chat")
@@ -110,5 +108,10 @@ public class MessageController {
         final String requestTokenHeader = request.getHeader("Authorization");
         User user = this.userService.getUserByToken(requestTokenHeader);
         return new ResponseEntity<>(this.messageService.getRecievedMessagesByUser(user), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/recipients/{messageId}", method = RequestMethod.GET)
+    public ResponseEntity<?> getRecipientsByMessageId(@PathVariable long messageId) {
+        return new ResponseEntity<>(this.messageService.getRecipientsIdsByMessageId(messageId), HttpStatus.OK);
     }
 }

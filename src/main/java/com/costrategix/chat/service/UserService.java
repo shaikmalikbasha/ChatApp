@@ -59,4 +59,8 @@ public class UserService implements UserDetailsService {
     public List<UserDto> getUsersBySearchQuery(@RequestParam String q) {
         return this.userRepository.getUsersBySearchQuery(q);
     }
+
+    public List<UserDto> getUserDetailsByRecipientsIds(List<Long> recipients) {
+        return this.userRepository.getUserDetailsByRecipientsIds(recipients);
+    }
 }

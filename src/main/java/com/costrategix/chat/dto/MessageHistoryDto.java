@@ -12,35 +12,34 @@ public class MessageHistoryDto {
     private String content;
     private long senderId;
     private Long threadId;
-    private long recipientId;
+    private List<UserDto> recipients = new ArrayList<>();
     private boolean isRead;
     private String fileName;
-    private List<MessageHistoryDto> childs = new ArrayList<>();
+    private List<MessageHistoryDto> repliedMessages = new ArrayList<>();
 
     public MessageHistoryDto() {
     }
 
-    public MessageHistoryDto(long messageId, String subject, String content, long senderId, Long threadId, long recipientId, boolean isRead, String fileName) {
+    public MessageHistoryDto(long messageId, String subject, String content, long senderId, Long threadId, boolean isRead, String fileName) {
         this.messageId = messageId;
         this.subject = subject;
         this.content = content;
         this.senderId = senderId;
         this.threadId = threadId;
-        this.recipientId = recipientId;
         this.isRead = isRead;
         this.fileName = fileName;
     }
 
-    public MessageHistoryDto(long messageId, String subject, String content, long senderId, Long threadId, long recipientId, boolean isRead, String fileName, List<MessageHistoryDto> childs) {
+    public MessageHistoryDto(long messageId, String subject, String content, long senderId, Long threadId, List<UserDto> recipients, boolean isRead, String fileName, List<MessageHistoryDto> repliedMessages) {
         this.messageId = messageId;
         this.subject = subject;
         this.content = content;
         this.senderId = senderId;
         this.threadId = threadId;
-        this.recipientId = recipientId;
+        this.recipients = recipients;
         this.isRead = isRead;
         this.fileName = fileName;
-        this.childs = childs;
+        this.repliedMessages = repliedMessages;
     }
 
     public long getMessageId() {
@@ -83,14 +82,6 @@ public class MessageHistoryDto {
         this.senderId = senderId;
     }
 
-    public long getRecipientId() {
-        return recipientId;
-    }
-
-    public void setRecipientId(long recipientId) {
-        this.recipientId = recipientId;
-    }
-
     public boolean isRead() {
         return isRead;
     }
@@ -107,26 +98,19 @@ public class MessageHistoryDto {
         this.fileName = fileName;
     }
 
-    public List<MessageHistoryDto> getChilds() {
-        return childs;
+    public List<MessageHistoryDto> getRepliedMessages() {
+        return repliedMessages;
     }
 
-    public void setChilds(List<MessageHistoryDto> childs) {
-        this.childs = childs;
+    public void setRepliedMessages(List<MessageHistoryDto> repliedMessages) {
+        this.repliedMessages = repliedMessages;
     }
 
-    @Override
-    public String toString() {
-        return "\n{" +
-                "childs=" + childs +
-                ", messageId=" + messageId +
-                ", subject='" + subject + '\'' +
-                ", content='" + content + '\'' +
-                ", senderId=" + senderId +
-                ", threadId=" + threadId +
-                ", recipientId=" + recipientId +
-                ", isRead=" + isRead +
-                ", fileName='" + fileName + '\'' +
-                '}';
+    public List<UserDto> getRecipients() {
+        return recipients;
+    }
+
+    public void setRecipients(List<UserDto> recipients) {
+        this.recipients = recipients;
     }
 }
